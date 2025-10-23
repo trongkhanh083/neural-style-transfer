@@ -1,7 +1,6 @@
 __pycache__/
 data/
+checkpoints/
 examples/results/
 examples/thumbs/
 results/
-.mp4
-.ckpt
