@@ -1,6 +1,5 @@
 __pycache__/
 data/
 checkpoints/
-examples/results/
-examples/thumbs/
 results/
+examples/style/others

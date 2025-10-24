@@ -8,7 +8,7 @@ import inference
 from optimize import optimize
 from utils import save_img, get_img, exists, list_files
 
-CONTENT_WEIGHT = 7.5e0
+CONTENT_WEIGHT = 1.5e1
 STYLE_WEIGHT = 1e2
 TV_WEIGHT = 2e2
 
