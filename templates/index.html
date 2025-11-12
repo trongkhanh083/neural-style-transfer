@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Van Gogh Art Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>"> -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons8-artist-16.png">
+    <style>
+        .image-container {
+            height: 500px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .image-container:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+        }
+        .image-container img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .style-option {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+        .style-option:hover {
+            transform: translateY(-2px);
+            border-color: #c7d2fe;
+        }
+        .style-option.selected {
+            border-color: #8b5cf6;
+            background-color: #faf5ff;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+        }
+        .style-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        .style-option.selected .style-preview {
+            border-color: #8b5cf6;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            animation: zoomIn 0.3s;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Style preview modal */
+        .style-preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .style-preview-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen">
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Style Preview Modal -->
+    <div id="stylePreviewModal" class="style-preview-modal" onclick="closeStylePreviewOnBackground(event)">
+        <span class="close" onclick="closeStylePreview()">&times;</span>
+        <img id="stylePreviewImage" class="style-preview-content" onclick="event.stopPropagation()">
+    </div>
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3 flex items-center justify-center gap-3">
+                <span>🎨</span>
+                Van Gogh Art Studio
+                <span>✨</span>
+            </h1>
+            <p class="text-lg text-gray-600">Transform your photos with iconic Van Gogh painting styles</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <!-- Left: Upload & Style Selection -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Upload Section -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">📸 Upload Photo</h2>
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all hover:border-purple-400 cursor-pointer"
+                         id="dropZone"
+                         onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div class="space-y-3">
+                            <div class="text-4xl">🖼️</div>
+                            <p class="text-gray-600 font-medium">Click to upload or drag & drop</p>
+                            <p class="text-sm text-gray-500">JPEG, PNG, JPG (Max 10MB)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Style Selection -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">🎨 Choose Style</h2>
+                        <span class="text-sm text-gray-500">Click thumbnails to preview</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto pr-2" id="styleGrid">
+                        {% for style_key, style_data in styles.items() %}
+                        <div class="style-option rounded-xl p-3 cursor-pointer transition-all"
+                             data-style="{{ style_key }}"
+                             onclick="selectStyle('{{ style_key }}')">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ style_data.preview }}" 
+                                     alt="{{ style_data.name }}" 
+                                     class="style-preview cursor-pointer"
+                                     onclick="event.stopPropagation(); previewStyleImage('{{ style_data.preview }}', '{{ style_data.name }}')">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-gray-700 truncate">{{ style_data.name }}</div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <div class="w-2 h-2 rounded-full bg-purple-500 style-dot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <button id="processBtn" 
+                            class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                        🎨 Create Van Gogh Art
+                    </button>
+
+                    <a id="downloadBtn" 
+                       class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold mt-3 hover:bg-green-700 transition-all text-center block hidden">
+                       ⬇️ Download Artwork
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Image Preview -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Original Image -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <span>📷</span>
+                                Original Photo
+                            </h3>
+                            <div class="image-container" id="originalContainer" onclick="openFullImage('original')">
+                                <div class="text-center text-gray-500">
+                                    <div class="text-4xl mb-2">👆</div>
+                                    <p>Upload a photo to begin</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Image -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <span>🎨</span>
+                                Van Gogh Art
+                                <span id="selectedStyleName" class="text-sm font-normal text-purple-600 bg-purple-50 px-2 py-1 rounded-full"></span>
+                            </h3>
+                            <div class="image-container" id="resultContainer" onclick="openFullImage('result')">
+                                <div class="text-center text-gray-500">
+                                    <div class="text-4xl mb-2">✨</div>
+                                    <p>Your artwork will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processing Indicator -->
+                    <div id="processingIndicator" class="mt-6 text-center hidden">
+                        <div class="inline-flex items-center gap-3 bg-blue-50 text-blue-700 px-6 py-4 rounded-xl border border-blue-200">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                            <div class="text-left">
+                                <span class="font-semibold" id="processingText">Applying Van Gogh style...</span>
+                                <p class="text-sm text-blue-600 mt-1">This may take a few moments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedStyle = null;
+        let currentFileName = null;
+        let currentJobId = null;
+        let originalImageUrl = null;
+        let resultImageUrl = null;
+
+        // Modal functionality
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        const closeBtn = document.getElementsByClassName("close")[0];
+
+        function openFullImage(type) {
+            if (type === 'original' && originalImageUrl) {
+                modal.style.display = "block";
+                modalImg.src = originalImageUrl;
+            } else if (type === 'result' && resultImageUrl) {
+                modal.style.display = "block";
+                modalImg.src = resultImageUrl;
+            }
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Style preview modal
+        function previewStyleImage(previewUrl, styleName) {
+            const modal = document.getElementById("stylePreviewModal");
+            const img = document.getElementById("stylePreviewImage");
+            img.src = previewUrl;
+            img.alt = styleName;
+            modal.style.display = "block";
+        }
+
+        function closeStylePreview() {
+            document.getElementById("stylePreviewModal").style.display = "none";
+        }
+
+        function closeStylePreviewOnBackground(event) {
+            if (event.target === document.getElementById("stylePreviewModal")) {
+                closeStylePreview();
+            }
+        }
+
+        // Style selection
+        function selectStyle(styleKey) {
+            selectedStyle = styleKey;
+            const styleName = document.querySelector(`[data-style="${styleKey}"] .font-medium`).textContent;
+            document.getElementById('selectedStyleName').textContent = styleName;
+            
+            // Update all style options
+            document.querySelectorAll('.style-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-style="${styleKey}"]`).classList.add('selected');
+            
+            updateProcessButton();
+        }
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        // Drag and drop handlers
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('border-purple-500', 'bg-purple-50'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-purple-500', 'bg-purple-50'), false);
+        });
+        
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }
+        
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+        
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    previewImage(file);
+                } else {
+                    alert('Please select an image file (JPEG, PNG, JPG).');
+                }
+            }
+        }
+        
+        function previewImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const originalContainer = document.getElementById('originalContainer');
+                originalContainer.innerHTML = `<img src="${e.target.result}" class="rounded-lg cursor-zoom-in">`;
+                
+                // Store the uploaded image data
+                originalImageUrl = e.target.result;
+                
+                currentFileName = file.name;
+                updateProcessButton();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function updateProcessButton() {
+            const processBtn = document.getElementById('processBtn');
+            processBtn.disabled = !(selectedStyle && currentFileName);
+        }
+        
+        // Process image
+        document.getElementById('processBtn').addEventListener('click', async function() {
+            if (!selectedStyle || !fileInput.files[0]) return;
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('style', selectedStyle);
+            
+            // Show processing state
+            document.getElementById('processingIndicator').classList.remove('hidden');
+            const styleName = document.querySelector(`[data-style="${selectedStyle}"] .font-medium`).textContent;
+            document.getElementById('processingText').textContent = `Applying ${styleName}...`;
+            document.getElementById('processBtn').disabled = true;
+            document.getElementById('processBtn').textContent = 'Creating Artwork...';
+            
+            try {
+                const response = await fetch('/process/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentJobId = result.job_id;
+                    originalImageUrl = result.original_url;
+                    resultImageUrl = result.result_url;
+                    pollStatus();
+                } else {
+                    throw new Error(result.detail || 'Processing failed');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+                resetProcessingState();
+            }
+        });
+        
+        async function pollStatus() {
+            const maxAttempts = 30;
+            const attemptInterval = 2000;
+            
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                try {
+                    const response = await fetch(`/status/${currentJobId}`);
+                    const status = await response.json();
+                    
+                    if (status.status === 'completed') {
+                        // Result is ready
+                        const resultContainer = document.getElementById('resultContainer');
+                        resultContainer.innerHTML = `<img src="${status.preview_url}?t=${Date.now()}" class="rounded-lg cursor-zoom-in">`;
+                        
+                        // Update full resolution URL
+                        resultImageUrl = status.result_url;
+                        
+                        // Show download button
+                        const downloadBtn = document.getElementById('downloadBtn');
+                        downloadBtn.href = status.download_url;
+                        downloadBtn.download = `van_gogh_${selectedStyle}.jpg`;
+                        downloadBtn.classList.remove('hidden');
+                        
+                        resetProcessingState();
+                        return;
+                    } else if (status.status === 'error') {
+                        throw new Error(status.message);
+                    }
+                } catch (error) {
+                    console.log('Error checking status:', error);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, attemptInterval));
+            }
+            
+            alert('Processing took too long. Please try again.');
+            resetProcessingState();
+        }
+        
+        function resetProcessingState() {
+            document.getElementById('processingIndicator').classList.add('hidden');
+            document.getElementById('processBtn').disabled = false;
+            document.getElementById('processBtn').textContent = '🎨 Create Van Gogh Art';
+            currentJobId = null;
+        }
+    </script>
+</body>
+</html>

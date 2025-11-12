@@ -1,5 +1,8 @@
 __pycache__/
 data/
 checkpoints/
-results/
-examples/style/others
+results/others/
+results/video/
+examples/style/others/
+
+.dockerignore
