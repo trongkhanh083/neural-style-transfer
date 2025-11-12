@@ -59,7 +59,7 @@ cd neural-style-transfer
 ```
 ### Create conda environment
 ```
-conda create -n fast-nst tensorflow-gpu==2.1.0
+conda create -n fast-nst tensorflow-gpu=2.1.0
 conda activate fast-nst
 ```
 
