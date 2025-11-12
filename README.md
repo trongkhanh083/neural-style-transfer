@@ -7,8 +7,8 @@
 
 Transform your photos into stunning Van Gogh-style masterpieces using deep learning and neural style transfer. Experience the magic of AI art generation with just one click!
 
-![Van Gogh Art Studio Demo]()
-![Result Demo]()
+![Van Gogh Art Studio Demo](static/demo.png)
+![Result Demo](static/result_demo.jpg)
 
 ## ✨ Features
 
@@ -67,5 +67,3 @@ docker run -p 8000:8000 van-gogh-studio
   - FastAPI for the robust web framework
   - Docker for seamless deployment
   - The open-source community for various AI/ML libraries
-
-<div align="center">Made with ❤️ and 🎨 Transform your world with AI art</div>
