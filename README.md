@@ -8,7 +8,30 @@
 Transform your photos into stunning Van Gogh-style masterpieces using deep learning and neural style transfer. Experience the magic of AI art generation with just one click!
 
 ![Van Gogh Art Studio Demo](static/demo.png)
-![Result Demo](static/result_demo.jpg)
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>Content</strong></td>
+      <td align="center"><strong>Style</strong></td>
+      <td align="center"><strong>Result</strong></td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="examples/content/mountain.jpg" style="width: 526px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Original Mountain">
+        <br>
+      </td>
+      <td align="center">
+        <img src="examples/style/van_gogh/wheatfield_with_crows.jpg" style="width: 730px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Wheatfield Style">
+        <br>
+      </td>
+      <td align="center">
+        <img src="static/result_demo.jpg" style="width: 526px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Van Gogh Result">
+        <br>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ## ✨ Features
 
