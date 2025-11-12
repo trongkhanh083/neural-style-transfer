@@ -18,15 +18,15 @@ Transform your photos into stunning Van Gogh-style masterpieces using deep learn
     </tr>
     <tr>
       <td align="center">
-        <img src="examples/content/mountain.jpg" style="width: 526px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Original Mountain">
+        <img src="examples/content/mountain.jpg" style="width: 400px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Original Mountain">
         <br>
       </td>
       <td align="center">
-        <img src="examples/style/van_gogh/wheatfield_with_crows.jpg" style="width: 730px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Wheatfield Style">
+        <img src="examples/style/van_gogh/wheatfield_with_crows.jpg" style="width: 400px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Wheatfield Style">
         <br>
       </td>
       <td align="center">
-        <img src="static/result_demo.jpg" style="width: 526px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Van Gogh Result">
+        <img src="static/result_demo.jpg" style="width: 400px; height: 350px; object-fit: cover; border-radius: 8px;" alt="Van Gogh Result">
         <br>
       </td>
     </tr>
